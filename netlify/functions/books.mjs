@@ -3,6 +3,8 @@ import { getStore } from '@netlify/blobs'
 const store = () => getStore('video-books', { consistency: 'strong' })
 const manifestKey = id => `manifests/${id}.json`
 const pagesPrefix = id => `pages/${id}/`
+const narrationPrefix = id => `narration/${id}/`
+const narrationMetaPrefix = id => `narration-meta/${id}/`
 
 function json(data, status = 200) {
   return Response.json(data, { status, headers: { 'cache-control': 'no-store' } })
@@ -42,8 +44,16 @@ export default async (req) => {
 
     if (method === 'DELETE') {
       if (!id) return json({ error: 'Missing book id.' }, 400)
-      const result = await books.list({ prefix: pagesPrefix(id) })
-      await Promise.all(result.blobs.map(entry => books.delete(entry.key)))
+      const [pages, narration, narrationMeta] = await Promise.all([
+        books.list({ prefix: pagesPrefix(id) }),
+        books.list({ prefix: narrationPrefix(id) }),
+        books.list({ prefix: narrationMetaPrefix(id) }),
+      ])
+      await Promise.all([
+        ...pages.blobs.map(entry => books.delete(entry.key)),
+        ...narration.blobs.map(entry => books.delete(entry.key)),
+        ...narrationMeta.blobs.map(entry => books.delete(entry.key)),
+      ])
       await books.delete(manifestKey(id))
       return json({ ok: true })
     }
