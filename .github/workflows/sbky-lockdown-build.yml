@@ -37,7 +37,11 @@ jobs:
         shell: bash
         run: |
           mkdir -p assets
-          curl -L --fail "https://assets.mixkit.co/sfx/preview/mixkit-vintage-warning-alarm-990.mp3" -o assets/alarm.mp3
+          curl -L --fail \
+            -A "Mozilla/5.0" \
+            -e "https://mixkit.co/free-sound-effects/alarm/" \
+            "https://assets.mixkit.co/sfx/preview/mixkit-vintage-warning-alarm-990.mp3" \
+            -o assets/alarm.mp3
       - name: Install build dependencies
         run: npm install --no-audit --no-fund
       - name: Build desktop package
