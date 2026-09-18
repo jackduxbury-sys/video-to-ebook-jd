@@ -33,15 +33,11 @@ jobs:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: sbky-lockdown/package.json
-      - name: Download licensed alarm
+      - name: Restore bundled alarm
         shell: bash
         run: |
-          mkdir -p assets
-          curl -L --fail \
-            -A "Mozilla/5.0" \
-            -e "https://mixkit.co/free-sound-effects/alarm/" \
-            "https://assets.mixkit.co/sfx/preview/mixkit-vintage-warning-alarm-990.mp3" \
-            -o assets/alarm.mp3
+          node -e "const fs=require('fs');fs.writeFileSync('assets/alarm.ogg',Buffer.from(fs.readFileSync('assets/alarm.b64','utf8').trim(),'base64'))"
+          rm assets/alarm.b64
       - name: Install build dependencies
         run: npm install --no-audit --no-fund
       - name: Build desktop package
