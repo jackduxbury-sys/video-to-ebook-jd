@@ -95,7 +95,7 @@ async function connectRealtime() {
       const ref = String(socketRef++);
       channelJoinRef = ref;
       wsSend(`realtime:${CHANNEL_NAME}`, 'phx_join',
-        {config:{broadcast:{self:true,ack:true},presence:{enabled:false},postgres_changes:[],private:false}}, ref, ref);
+        {config:{broadcast:{self:false,ack:true},presence:{enabled:false},postgres_changes:[],private:false}}, ref, ref);
       clearInterval(heartbeatTimer);
       heartbeatTimer = setInterval(() => {
         try { wsSend('phoenix','heartbeat',{},String(socketRef++),null); } catch {}
